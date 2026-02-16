@@ -16,7 +16,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 2rem;
@@ -54,6 +54,82 @@
     <div class="container">
         <h1>一千零一夜：圖版遊戲助手</h1>
 
+        <!-- 獨立擲骰區塊 (Standalone Dice Roller) -->
+        <div
+            style="background: #fff3cd; border: 1px solid #ffeeba; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+            <!-- D6 Row -->
+            <div
+                style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #e0a800; padding-bottom: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin: 0; color: #856404;">🎲 命運骰子 (D6)</h3>
+                    <p style="margin: 0; font-size: 0.8rem; color: #856404;">判定數字 1-6</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div id="d6-display"
+                        style="font-size: 2rem; font-weight: bold; color: #333; width: 3rem; text-align: center; background: rgba(255,255,255,0.5); border-radius: 4px;">
+                        -</div>
+                    <button type="button" onclick="rollD6()"
+                        style="background: #ffc107; color: #333; border: 1px solid #e0a800; padding: 0.4rem 1rem; border-radius: 4px; cursor: pointer;">擲骰</button>
+                </div>
+            </div>
+
+            <!-- Effect Die Row -->
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3 style="margin: 0; color: #856404;">⚖️ 狀態骰子 (+/-)</h3>
+                    <p style="margin: 0; font-size: 0.8rem; color: #856404;">空白x2, 加號x2, 減號x2</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div id="special-display"
+                        style="font-size: 2rem; font-weight: bold; color: #333; width: 3rem; text-align: center; background: rgba(255,255,255,0.5); border-radius: 4px;">
+                        -</div>
+                    <button type="button" onclick="rollSpecial()"
+                        style="background: #17a2b8; color: white; border: 1px solid #117a8b; padding: 0.4rem 1rem; border-radius: 4px; cursor: pointer;">擲骰</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function animateRoll(element, valueGenerator) {
+                let count = 0;
+                // clear previous state
+                element.style.color = "#333";
+                element.style.transform = "scale(1)";
+
+                const interval = setInterval(() => {
+                    const val = valueGenerator();
+                    element.innerText = val === ' ' ? '○' : val; // Animate with random values
+                    count++;
+                    if (count > 10) {
+                        clearInterval(interval);
+                        // Final result styling
+                        const finalVal = valueGenerator(); // Get final value
+                        element.innerText = finalVal;
+
+                        element.style.color = "#d9534f"; // Highlight result
+                        element.style.transform = "scale(1.2)";
+                        element.style.transition = "transform 0.2s, color 0.2s";
+
+                        setTimeout(() => {
+                            element.style.color = "#333";
+                            element.style.transform = "scale(1)";
+                        }, 500);
+                    }
+                }, 50);
+            }
+
+            function rollD6() {
+                const display = document.getElementById('d6-display');
+                animateRoll(display, () => Math.floor(Math.random() * 6) + 1);
+            }
+
+            function rollSpecial() {
+                const display = document.getElementById('special-display');
+                const faces = ['(空)', '(空)', '+', '+', '-', '-'];
+                animateRoll(display, () => faces[Math.floor(Math.random() * faces.length)]);
+            }
+        </script>
+
         <form hx-post="/encounter" hx-target="#result-area" hx-swap="outerHTML">
             <div style="margin-bottom: 1rem;">
                 <label for="encounterId">遭遇編號 (Encounter ID 1-121):</label>
@@ -82,16 +158,16 @@
             </div>
 
             <div style="margin-bottom: 1rem; border-top: 1px solid #ddd; padding-top: 1rem;">
-                <label for="specialEncounterId">Special Encounter (Overrides above):</label>
+                <label for="specialEncounterId">特殊遭遇 (身處地點符合圖示):</label>
                 <select id="specialEncounterId" name="specialEncounterId"
                     style="padding: 0.5rem; width: 100%; box-sizing: border-box;">
-                    <option value="">-- None --</option>
+                    <option value="">-- 無 --</option>
                     <option th:each="card : ${specialCards}" th:value="${card.id}" th:text="${card.name}">Volcano
                     </option>
                 </select>
             </div>
 
-            <button type="submit">Consult the Book of Tales</button>
+            <button type="submit">查詢天方夜譚指引</button>
         </form>
 
         <div id="result-area" th:fragment="result-area" style="margin-top: 2rem;">
@@ -131,10 +207,10 @@
                     <div id="story-display" th:fragment="story-display"
                         style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">
                         <div th:if="${event != null}">
-                            <h3 th:text="${event.title}">Story Title</h3>
+                            <h3 th:text="${event.title}">故事標題</h3>
                             <div th:utext="${event.description}"
                                 style="background: #fdf6e3; padding: 1rem; border-radius: 4px; line-height: 1.6; margin-bottom: 1rem;">
-                                Story description goes here...
+                                故事描述...
                             </div>
 
                             <h4>可能的結果 (請根據您的狀態/技能選擇):</h4>
@@ -154,7 +230,7 @@
                         style="border: 1px solid #eee; border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
                         <details style="background: #fff;" th:if="${outcome != null}">
                             <summary style="padding: 0.5rem; cursor: pointer; background: #e9ecef; font-weight: bold;">
-                                <span th:text="${outcome.conditionParam}">Skill Check</span>
+                                <span th:text="${outcome.conditionParam}">技能檢定</span>
                             </summary>
                             <div style="padding: 1rem; border-top: 1px solid #eee;">
                                 <!-- If there are children, render them recursively -->
@@ -165,13 +241,16 @@
                                     </th:block>
                                 </div>
 
-                                <!-- If text is present, show it (leaf node or mixed) -->
-                                <div th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}">
-                                    <p style="margin-top: 0;"><strong>結果：</strong> <span
-                                            th:text="${outcome.outcomeText}">You win!</span></p>
+                                <!-- If text OR reward is present -->
+                                <div
+                                    th:if="${(outcome.outcomeText != null && outcome.outcomeText != '') || (outcome.rewardStr != null && outcome.rewardStr != '')}">
+                                    <p th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}"
+                                        style="margin-top: 0;">
+                                        <strong>結果：</strong> <span th:text="${outcome.outcomeText}">你獲勝了!</span>
+                                    </p>
                                     <p th:if="${outcome.rewardStr != null && outcome.rewardStr != ''}"
                                         style="margin-bottom: 0; color: #d9534f;">
-                                        <strong>獎勵：</strong> <span th:text="${outcome.rewardStr}">+1 Destiny</span>
+                                        <strong>獎勵：</strong> <span th:text="${outcome.rewardStr}">+1 命運</span>
                                     </p>
                                 </div>
                             </div>
@@ -184,8 +263,8 @@
     </div>
 
     <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #ddd; text-align: center;">
-        <a href="/events" style="font-size: 1.2em; color: #007bff; text-decoration: none;">&rarr; 前往直接查詢事件頁面 (Go to
-            Event Lookup)</a>
+        <a href="/events" style="font-size: 1.2em; color: #007bff; text-decoration: none;">&rarr; 前往直接查詢事件頁面 (Lookup
+            Event)</a>
     </div>
     </div>
 </body>

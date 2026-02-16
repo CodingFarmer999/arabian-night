@@ -107,10 +107,13 @@
                             </th:block>
                         </div>
 
-                        <!-- If text is present, show it (leaf node or mixed) -->
-                        <div th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}">
-                            <p style="margin-top: 0;"><strong>結果：</strong> <span th:text="${outcome.outcomeText}">You
-                                    win!</span></p>
+                        <!-- If text OR reward is present -->
+                        <div
+                            th:if="${(outcome.outcomeText != null && outcome.outcomeText != '') || (outcome.rewardStr != null && outcome.rewardStr != '')}">
+                            <p th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}"
+                                style="margin-top: 0;">
+                                <strong>結果：</strong> <span th:text="${outcome.outcomeText}">You win!</span>
+                            </p>
                             <p th:if="${outcome.rewardStr != null && outcome.rewardStr != ''}"
                                 style="margin-bottom: 0; color: #d9534f;">
                                 <strong>獎勵：</strong> <span th:text="${outcome.rewardStr}">+1 Destiny</span>

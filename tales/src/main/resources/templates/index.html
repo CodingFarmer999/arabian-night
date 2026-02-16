@@ -8,46 +8,7 @@
     <!-- 引入 HTMX WebJar -->
     <!-- 引入 HTMX WebJar -->
     <script th:src="@{/webjars/htmx.org/2.0.2/dist/htmx.min.js}"></script>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 2rem;
-            background: #f4f4f9;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        #result {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-left: 4px solid #007bff;
-            background: #e9ecef;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 
 <body>
@@ -89,46 +50,7 @@
             </div>
         </div>
 
-        <script>
-            function animateRoll(element, valueGenerator) {
-                let count = 0;
-                // clear previous state
-                element.style.color = "#333";
-                element.style.transform = "scale(1)";
-
-                const interval = setInterval(() => {
-                    const val = valueGenerator();
-                    element.innerText = val === ' ' ? '○' : val; // Animate with random values
-                    count++;
-                    if (count > 10) {
-                        clearInterval(interval);
-                        // Final result styling
-                        const finalVal = valueGenerator(); // Get final value
-                        element.innerText = finalVal;
-
-                        element.style.color = "#d9534f"; // Highlight result
-                        element.style.transform = "scale(1.2)";
-                        element.style.transition = "transform 0.2s, color 0.2s";
-
-                        setTimeout(() => {
-                            element.style.color = "#333";
-                            element.style.transform = "scale(1)";
-                        }, 500);
-                    }
-                }, 50);
-            }
-
-            function rollD6() {
-                const display = document.getElementById('d6-display');
-                animateRoll(display, () => Math.floor(Math.random() * 6) + 1);
-            }
-
-            function rollSpecial() {
-                const display = document.getElementById('special-display');
-                const faces = ['(空)', '(空)', '+', '+', '-', '-'];
-                animateRoll(display, () => faces[Math.floor(Math.random() * faces.length)]);
-            }
-        </script>
+        <script th:src="@{/js/dice-roller.js}"></script>
 
         <form hx-post="/encounter" hx-target="#result-area" hx-swap="outerHTML">
             <div style="margin-bottom: 1rem;">

@@ -6,48 +6,7 @@
     <title>天方夜譚 - 查詢事件</title>
     <!-- 引入 HTMX WebJar -->
     <script th:src="@{/webjars/htmx.org/2.0.2/dist/htmx.min.js}"></script>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 2rem;
-            background: #f4f4f9;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 
 <body>

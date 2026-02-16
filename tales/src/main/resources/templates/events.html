@@ -11,10 +11,10 @@
 
 <body>
     <div class="container">
-        <h1>直接查詢事件 (Event Lookup)</h1>
+        <h1>直接查詢事件</h1>
 
         <div style="margin-bottom: 2rem;">
-            <a href="/">&larr; 回首頁 (Back to Home)</a>
+            <a href="/">&larr; 回首頁</a>
         </div>
 
         <form hx-post="/event-lookup" hx-target="#direct-result" hx-swap="innerHTML">
@@ -47,6 +47,11 @@
                         </th:block>
                     </div>
                     <p th:if="${event.outcomes == null || event.outcomes.empty}">沒有列出特定結果。</p>
+
+                    <div style="margin-top: 1.5rem; text-align: center;">
+                        <button type="button" onclick="window.location.href='/events'" style="background: #6c757d;">重置畫面
+                            (Reset)</button>
+                    </div>
                 </div>
             </div>
 

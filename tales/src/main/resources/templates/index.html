@@ -6,6 +6,7 @@
     <title>天方夜譚</title>
     <!-- 引入 HTMX WebJar -->
     <script th:src="@{/webjars/htmx.org/2.0.2/dist/htmx.min.js}"></script>
+    <script th:src="@{/js/dice-roller.js}"></script>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 
@@ -48,8 +49,6 @@
             </div>
         </div>
 
-        <script th:src="@{/js/dice-roller.js}"></script>
-
         <form hx-post="/encounter" hx-target="#result-area" hx-swap="outerHTML">
             <div style="margin-bottom: 1rem;">
                 <label for="encounterId">遭遇編號 (Encounter ID 1-121):</label>
@@ -78,12 +77,11 @@
             </div>
 
             <div style="margin-bottom: 1rem; border-top: 1px solid #ddd; padding-top: 1rem;">
-                <label for="specialEncounterId">特殊遭遇 (身處地點符合圖示):</label>
+                <label for="specialEncounterId">地形遭遇 (身處地點符合圖示 N):</label>
                 <select id="specialEncounterId" name="specialEncounterId"
                     style="padding: 0.5rem; width: 100%; box-sizing: border-box;">
                     <option value="">-- 無 --</option>
-                    <option th:each="card : ${specialCards}" th:value="${card.id}" th:text="${card.name}">Volcano
-                    </option>
+                    <option th:each="card : ${specialCards}" th:value="${card.id}" th:text="${card.name}">磁力山</option>
                 </select>
             </div>
 
@@ -99,8 +97,8 @@
                 </div>
 
                 <div th:if="${response.reactionLetter != null}">
-                    <h3>命運揭曉！</h3>
-                    <p><strong>反應矩陣 (Reaction Matrix):</strong> <span th:text="${response.reactionLetter}"
+                    <h3>你的遭遇！</h3>
+                    <p><strong>反應矩陣：</strong> <span th:text="${response.reactionLetter}"
                             style="font-size: 1.5em; color: #d9534f;">A</span></p>
 
                     <div th:if="${response.lookup != null}">
@@ -145,6 +143,11 @@
                         </div>
                     </div>
 
+                    <div style="margin-top: 1rem; margin-bottom: 1rem; text-align: center;">
+                        <button type="button" onclick="window.location.href='/'" style="background: #6c757d;">重置畫面
+                            (Reset)</button>
+                    </div>
+
                     <!-- Recursive Fragment for Outcomes -->
                     <div th:fragment="outcomeFragment(outcome)"
                         style="border: 1px solid #eee; border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
@@ -179,13 +182,10 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
 
-    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #ddd; text-align: center;">
-        <a href="/events" style="font-size: 1.2em; color: #007bff; text-decoration: none;">&rarr; 前往直接查詢事件頁面 (Lookup
-            Event)</a>
-    </div>
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #ddd; text-align: center;">
+            <a href="/events" style="font-size: 1.2em; color: #007bff; text-decoration: none;">&rarr; 前往直接查詢事件頁面</a>
+        </div>
     </div>
 </body>
 

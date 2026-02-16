@@ -43,7 +43,7 @@ public interface TalesMapper {
   @Select("SELECT * FROM story_outcomes WHERE event_id = #{eventId} ORDER BY id")
   List<StoryOutcome> findOutcomesByEventId(@Param("eventId") int eventId);
 
-  @Select("SELECT * FROM encounter_cards WHERE type = 'SPECIAL'")
+  @Select("SELECT * FROM encounter_cards WHERE type = 'SPECIAL' ORDER BY adj_id")
   List<EncounterCard> findAllSpecialCards();
 
   @Select("SELECT * FROM encounter_cards WHERE id = #{id}")

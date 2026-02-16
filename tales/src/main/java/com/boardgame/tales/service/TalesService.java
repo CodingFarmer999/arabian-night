@@ -126,8 +126,7 @@ public class TalesService {
      */
     private List<StoryOutcome> buildHierarchy(List<StoryOutcome> allOutcomes) {
         List<StoryOutcome> roots = new ArrayList<>();
-        // Simple O(N^2) or Map-based approach. Since N is small (<10 usually), map is
-        // fine.
+
         // Map ID -> Outcome
         java.util.Map<Integer, StoryOutcome> map = new java.util.HashMap<>();
         for (StoryOutcome outcome : allOutcomes) {
@@ -164,7 +163,6 @@ public class TalesService {
             List<StoryOutcome> rootOutcomes = buildHierarchy(allOutcomes);
             event.setOutcomes(rootOutcomes);
         }
-        logger.info("Event: {}", event);
         return event;
     }
 }

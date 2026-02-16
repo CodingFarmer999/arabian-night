@@ -187,6 +187,27 @@
             <a href="/events" style="font-size: 1.2em; color: #007bff; text-decoration: none;">&rarr; 前往直接查詢事件頁面</a>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const encounterInput = document.getElementById('encounterId');
+            const dieRollInput = document.getElementById('dieRoll');
+            const specialSelect = document.getElementById('specialEncounterId');
+
+            function resetSpecial() {
+                if (specialSelect) {
+                    specialSelect.value = '';
+                }
+            }
+
+            if (encounterInput) {
+                encounterInput.addEventListener('change', resetSpecial);
+                encounterInput.addEventListener('input', resetSpecial); // Also trigger on typing
+            }
+            if (dieRollInput) {
+                dieRollInput.addEventListener('change', resetSpecial);
+            }
+        });
+    </script>
 </body>
 
 </html>

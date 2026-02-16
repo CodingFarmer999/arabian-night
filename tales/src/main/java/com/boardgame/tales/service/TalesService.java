@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.boardgame.tales.mapper.TalesMapper;
@@ -30,6 +31,7 @@ public class TalesService {
     /**
      * 取得所有特殊遭遇卡列表 (用於下拉選單)
      */
+    @Cacheable("specialEncounters")
     public List<EncounterCard> getSpecialEncounters() {
         return talesMapper.findAllSpecialCards();
     }

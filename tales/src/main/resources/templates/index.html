@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <title>天方夜譚</title>
+    <!-- 引入 HTMX WebJar -->
+    <!-- 引入 HTMX WebJar -->
+    <script th:src="@{/webjars/htmx.org/2.0.2/dist/htmx.min.js}"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+            background: #f4f4f9;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-left: 4px solid #007bff;
+            background: #e9ecef;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>一千零一夜：圖版遊戲助手</h1>
+
+        <form hx-post="/encounter" hx-target="#result-area" hx-swap="outerHTML">
+            <div style="margin-bottom: 1rem;">
+                <label for="encounterId">遭遇編號 (Encounter ID 1-121):</label>
+                <input type="number" id="encounterId" name="encounterId" min="1" max="121"
+                    style="padding: 0.5rem; width: 100%; box-sizing: border-box;">
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <label for="dieRoll">骰子點數 (Die Roll 1-12):</label>
+                <select id="dieRoll" name="dieRoll" style="padding: 0.5rem; width: 100%; box-sizing: border-box;">
+                    <!-- Generate options 1-12 or just hardcode representative ones if loops are annoying here, 
+                          but standard HTML 1-12 is better. -->
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 1rem; border-top: 1px solid #ddd; padding-top: 1rem;">
+                <label for="specialEncounterId">Special Encounter (Overrides above):</label>
+                <select id="specialEncounterId" name="specialEncounterId"
+                    style="padding: 0.5rem; width: 100%; box-sizing: border-box;">
+                    <option value="">-- None --</option>
+                    <option th:each="card : ${specialCards}" th:value="${card.id}" th:text="${card.name}">Volcano
+                    </option>
+                </select>
+            </div>
+
+            <button type="submit">Consult the Book of Tales</button>
+        </form>
+
+        <div id="result-area" th:fragment="result-area" style="margin-top: 2rem;">
+            <div th:if="${response != null}"
+                style="border: 1px solid #ddd; padding: 1rem; border-radius: 4px; background: #fff;">
+
+                <div th:if="${response.reactionLetter == null}">
+                    <p style="color: red;">未找到對應的結果 (請檢查輸入)。</p>
+                </div>
+
+                <div th:if="${response.reactionLetter != null}">
+                    <h3>命運揭曉！</h3>
+                    <p><strong>反應矩陣 (Reaction Matrix):</strong> <span th:text="${response.reactionLetter}"
+                            style="font-size: 1.5em; color: #d9534f;">A</span></p>
+
+                    <div th:if="${response.lookup != null}">
+                        <p><strong>遭遇：</strong> <span th:text="${response.lookup.fullText}">Beggar</span></p>
+                    </div>
+
+                    <div id="action-list">
+                        <h4>可選擇行動：</h4>
+                        <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            <li th:each="action : ${response.availableActions}" style="margin-bottom: 0;">
+                                <form hx-post="/select-action" hx-target="#story-display" hx-swap="outerHTML">
+                                    <input type="hidden" name="matrixLetter" th:value="${response.reactionLetter}" />
+                                    <input type="hidden" name="adjId" th:value="${response.lookup.adjId}" />
+                                    <input type="hidden" name="actionId" th:value="${action.id}" />
+                                    <button type="submit" style="background: #28a745;"
+                                        th:text="${action.name}">Pray</button>
+                                </form>
+                            </li>
+                        </ul>
+                        <p th:if="${#lists.isEmpty(response.availableActions)}">沒有可用的行動。</p>
+                    </div>
+
+                    <!-- Area to display the resulting story event -->
+                    <div id="story-display" th:fragment="story-display"
+                        style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">
+                        <div th:if="${event != null}">
+                            <h3 th:text="${event.title}">Story Title</h3>
+                            <div th:utext="${event.description}"
+                                style="background: #fdf6e3; padding: 1rem; border-radius: 4px; line-height: 1.6; margin-bottom: 1rem;">
+                                Story description goes here...
+                            </div>
+
+                            <h4>可能的結果 (請根據您的狀態/技能選擇):</h4>
+                            <div th:if="${event.outcomes != null}"
+                                style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <!-- Root level outcomes -->
+                                <th:block th:each="outItem : ${event.outcomes}">
+                                    <div th:replace="~{:: outcomeFragment(outcome=${outItem})}"></div>
+                                </th:block>
+                            </div>
+                            <p th:if="${event.outcomes == null || event.outcomes.empty}">沒有列出特定結果。</p>
+                        </div>
+                    </div>
+
+                    <!-- Recursive Fragment for Outcomes -->
+                    <div th:fragment="outcomeFragment(outcome)"
+                        style="border: 1px solid #eee; border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem;">
+                        <details style="background: #fff;" th:if="${outcome != null}">
+                            <summary style="padding: 0.5rem; cursor: pointer; background: #e9ecef; font-weight: bold;">
+                                <span th:text="${outcome.conditionParam}">Skill Check</span>
+                            </summary>
+                            <div style="padding: 1rem; border-top: 1px solid #eee;">
+                                <!-- If there are children, render them recursively -->
+                                <div th:if="${not #lists.isEmpty(outcome.children)}"
+                                    style="padding-left: 1rem; border-left: 2px solid #ccc;">
+                                    <th:block th:each="childItem : ${outcome.children}">
+                                        <div th:replace="~{:: outcomeFragment(outcome=${childItem})}"></div>
+                                    </th:block>
+                                </div>
+
+                                <!-- If text is present, show it (leaf node or mixed) -->
+                                <div th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}">
+                                    <p style="margin-top: 0;"><strong>結果：</strong> <span
+                                            th:text="${outcome.outcomeText}">You win!</span></p>
+                                    <p th:if="${outcome.rewardStr != null && outcome.rewardStr != ''}"
+                                        style="margin-bottom: 0; color: #d9534f;">
+                                        <strong>獎勵：</strong> <span th:text="${outcome.rewardStr}">+1 Destiny</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #ddd; text-align: center;">
+        <a href="/events" style="font-size: 1.2em; color: #007bff; text-decoration: none;">&rarr; 前往直接查詢事件頁面 (Go to
+            Event Lookup)</a>
+    </div>
+    </div>
+</body>
+
+</html>

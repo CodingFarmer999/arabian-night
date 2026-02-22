@@ -18,8 +18,7 @@
         <div
             style="background: #fff3cd; border: 1px solid #ffeeba; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
             <!-- D6 Row -->
-            <div
-                style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #e0a800; padding-bottom: 1rem; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div>
                     <h3 style="margin: 0; color: #856404;">🎲 命運骰子 (D6)</h3>
                     <p style="margin: 0; font-size: 0.8rem; color: #856404;">判定數字 1-6</p>
@@ -33,20 +32,6 @@
                 </div>
             </div>
 
-            <!-- Effect Die Row -->
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                    <h3 style="margin: 0; color: #856404;">⚖️ 狀態骰子 (+/-)</h3>
-                    <p style="margin: 0; font-size: 0.8rem; color: #856404;">空白x2, 加號x2, 減號x2</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div id="special-display"
-                        style="font-size: 2rem; font-weight: bold; color: #333; width: 3rem; text-align: center; background: rgba(255,255,255,0.5); border-radius: 4px;">
-                        -</div>
-                    <button type="button" onclick="rollSpecial()"
-                        style="background: #17a2b8; color: white; border: 1px solid #117a8b; padding: 0.4rem 1rem; border-radius: 4px; cursor: pointer;">擲骰</button>
-                </div>
-            </div>
         </div>
 
         <form hx-post="/encounter" hx-target="#result-area" hx-swap="outerHTML">
@@ -190,6 +175,14 @@
                                 <span th:text="${outcome.conditionParam}">技能檢定</span>
                             </summary>
                             <div style="padding: 1rem; border-top: 1px solid #eee;">
+
+                                <!-- If text OR reward is present -->
+                                <div th:if="${(outcome.outcomeText != null && outcome.outcomeText != '')}">
+                                    <p th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}"
+                                        style="margin-top: 0;">
+                                        <strong>結果：</strong> <span th:text="${outcome.outcomeText}">你獲勝了!</span>
+                                    </p>
+                                </div>
                                 <!-- If there are children, render them recursively -->
                                 <div th:if="${not #lists.isEmpty(outcome.children)}"
                                     style="padding-left: 1rem; border-left: 2px solid #ccc;">
@@ -199,12 +192,7 @@
                                 </div>
 
                                 <!-- If text OR reward is present -->
-                                <div
-                                    th:if="${(outcome.outcomeText != null && outcome.outcomeText != '') || (outcome.rewardStr != null && outcome.rewardStr != '')}">
-                                    <p th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}"
-                                        style="margin-top: 0;">
-                                        <strong>結果：</strong> <span th:text="${outcome.outcomeText}">你獲勝了!</span>
-                                    </p>
+                                <div th:if="${(outcome.rewardStr != null && outcome.rewardStr != '')}">
                                     <p th:if="${outcome.rewardStr != null && outcome.rewardStr != ''}"
                                         style="margin-bottom: 0; color: #d9534f;">
                                         <strong>獎勵：</strong> <span th:text="${outcome.rewardStr}">+1 命運</span>

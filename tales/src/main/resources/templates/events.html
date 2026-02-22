@@ -63,6 +63,15 @@
                         <span th:text="${outcome.conditionParam}">Skill Check</span>
                     </summary>
                     <div style="padding: 1rem; border-top: 1px solid #eee;">
+
+                        <!-- If text is present -->
+                        <div th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}">
+                            <p th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}"
+                                style="margin-top: 0;">
+                                <strong>結果：</strong> <span th:text="${outcome.outcomeText}">You win!</span>
+                            </p>
+                        </div>
+
                         <!-- If there are children, render them recursively -->
                         <div th:if="${not #lists.isEmpty(outcome.children)}"
                             style="padding-left: 1rem; border-left: 2px solid #ccc;">
@@ -71,13 +80,8 @@
                             </th:block>
                         </div>
 
-                        <!-- If text OR reward is present -->
-                        <div
-                            th:if="${(outcome.outcomeText != null && outcome.outcomeText != '') || (outcome.rewardStr != null && outcome.rewardStr != '')}">
-                            <p th:if="${outcome.outcomeText != null && outcome.outcomeText != ''}"
-                                style="margin-top: 0;">
-                                <strong>結果：</strong> <span th:text="${outcome.outcomeText}">You win!</span>
-                            </p>
+                        <!-- If reward is present -->
+                        <div th:if="${(outcome.rewardStr != null && outcome.rewardStr != '')}">
                             <p th:if="${outcome.rewardStr != null && outcome.rewardStr != ''}"
                                 style="margin-bottom: 0; color: #d9534f;">
                                 <strong>獎勵：</strong> <span th:text="${outcome.rewardStr}">+1 Destiny</span>

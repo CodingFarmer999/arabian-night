@@ -15,6 +15,7 @@ import com.boardgame.tales.model.EncounterCard;
 import com.boardgame.tales.model.EncounterLookup;
 import com.boardgame.tales.model.EncounterResponse;
 import com.boardgame.tales.model.Event;
+import com.boardgame.tales.model.SkillChoice;
 import com.boardgame.tales.model.StoryOutcome;
 
 @Service
@@ -121,6 +122,20 @@ public class TalesService {
             event.setOutcomes(rootOutcomes);
         }
         return event;
+    }
+
+    /**
+     * 獲取基於行動的目標 Event ID (但不抓取明細，以便於進行技能過濾)
+     */
+    public Integer getTargetEventId(String matrixLetter, int adjId, int actionId) {
+        return talesMapper.findTargetEventId(matrixLetter, adjId, actionId);
+    }
+
+    /**
+     * 取得基底遭遇與其相鄰遭遇(-1, +1)的技能需求
+     */
+    public List<SkillChoice> getSkillChoicesForEvents(int baseEventId) {
+        return talesMapper.findSkillChoicesForEvents(baseEventId);
     }
 
     /**

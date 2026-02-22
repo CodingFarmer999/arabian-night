@@ -65,4 +65,14 @@ public interface TalesMapper {
 
   @Select("SELECT * FROM encounter_cards WHERE id = #{id}")
   EncounterCard findCardById(@Param("id") int id);
+
+  @Select("""
+          SELECT DISTINCT so.event_id AS targetEventId, a.id AS skillId, a.name AS skillName
+          FROM story_outcomes so
+          JOIN outcome_conditions oc ON so.condition_param = CAST(oc.id AS VARCHAR)
+          JOIN attributes a ON a.id = oc.attribute_id AND a.attr_type = 'SKILL'
+          WHERE so.event_id IN (#{baseEventId}-1, #{baseEventId}, #{baseEventId}+1)
+          ORDER BY a.id, so.event_id
+      """)
+  List<com.boardgame.tales.model.SkillChoice> findSkillChoicesForEvents(@Param("baseEventId") int baseEventId);
 }

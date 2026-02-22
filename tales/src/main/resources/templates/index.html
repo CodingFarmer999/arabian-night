@@ -121,11 +121,45 @@
                         <p th:if="${#lists.isEmpty(response.availableActions)}">沒有可用的行動。</p>
                     </div>
 
+                    <!-- Area to display the skill choices -->
+                    <div id="story-display" th:fragment="skill-choice-display" th:if="${baseEventId != null}"
+                        style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">
+                        <h3>🌟 命運的掌控</h3>
+                        <p style="color: #666; font-size: 0.9em;">請檢視您的技能，若有符合條件的<span
+                                style="color: #d9534f; font-weight: bold;">精通技能</span>，可直接前往該段落。</p>
+
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;"
+                            th:if="${skills != null and !skills.empty}">
+                            <th:block th:each="skill : ${skills}">
+                                <form hx-post="/resolve-event" hx-target="#story-display" hx-swap="outerHTML">
+                                    <input type="hidden" name="baseEventId" th:value="${baseEventId}" />
+                                    <input type="hidden" name="chosenEventId" th:value="${skill.targetEventId}" />
+                                    <button type="submit"
+                                        style="background: #17a2b8; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer; font-weight: bold;"
+                                        th:text="${skill.skillName}">Skill</button>
+                                </form>
+                            </th:block>
+                        </div>
+                        <p th:if="${skills == null or skills.empty}"
+                            style="color: #856404; background: #fff3cd; padding: 0.5rem; border-radius: 4px;">
+                            該段落與相鄰段落無特別綁定的技能，請直接擲命運骰。
+                        </p>
+
+                        <form hx-post="/resolve-event" hx-target="#story-display" hx-swap="outerHTML"
+                            style="margin-top: 1rem; text-align: center;">
+                            <input type="hidden" name="baseEventId" th:value="${baseEventId}" />
+                            <button type="submit"
+                                style="background: #ffc107; color: #333; padding: 0.6rem 1.5rem; border-radius: 4px; border: 1px solid #e0a800; cursor: pointer; font-size: 1.1em; font-weight: bold; width: 100%;">
+                                🎲 沒有適用技能 / 不使用
+                            </button>
+                        </form>
+                    </div>
+
                     <!-- Area to display the resulting story event -->
                     <div id="story-display" th:fragment="story-display"
                         style="margin-top: 1rem; padding-top: 1rem; border-top: 2px dashed #ccc;">
                         <div th:if="${event != null}">
-                            <h3 th:text="${event.title}">故事標題</h3>
+                            <h3 th:text="${event.title != null ? event.title : '章節 ' + event.id}">故事標題</h3>
                             <div th:utext="${event.description}"
                                 style="background: #fdf6e3; padding: 1rem; border-radius: 4px; line-height: 1.6; margin-bottom: 1rem;">
                                 故事描述...

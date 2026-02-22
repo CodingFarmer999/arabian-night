@@ -63,19 +63,48 @@ public class TalesController {
             @RequestParam("adjId") int adjId,
             @RequestParam("actionId") int actionId,
             Model model) {
-        Event event = talesService.getEvent(matrixLetter, adjId, actionId);
+        Integer baseEventId = talesService.getTargetEventId(matrixLetter, adjId, actionId);
 
-        if (event != null) {
-            // Apply Destiny Die logic: -1, Blank (0), +1
-            // Randomly choose a modifier from {-1, 0, 1}
-            int modifier = ThreadLocalRandom.current().nextInt(3) - 1;
+        if (baseEventId != null) {
+            java.util.List<com.boardgame.tales.model.SkillChoice> skills = talesService
+                    .getSkillChoicesForEvents(baseEventId);
+            java.util.Map<String, Long> skillCounts = skills.stream()
+                    .collect(java.util.stream.Collectors.groupingBy(
+                            com.boardgame.tales.model.SkillChoice::getSkillName,
+                            java.util.stream.Collectors.counting()));
 
-            if (modifier != 0) {
-                int newId = event.getId() + modifier;
-                Event modifiedEvent = talesService.getEventById(newId);
-                if (modifiedEvent != null) {
-                    event = modifiedEvent;
+            for (com.boardgame.tales.model.SkillChoice skill : skills) {
+                if (skillCounts.get(skill.getSkillName()) > 1) {
+                    skill.setSkillName(skill.getSkillName() + " (跳轉段落: " + skill.getTargetEventId() + ")");
                 }
+            }
+
+            model.addAttribute("baseEventId", baseEventId);
+            model.addAttribute("skills", skills);
+            return "index :: skill-choice-display";
+        }
+
+        return "index :: story-display";
+    }
+
+    /**
+     * 處理選擇技能或命運骰的最終決定
+     */
+    @PostMapping("/resolve-event")
+    public String resolveEvent(@RequestParam("baseEventId") int baseEventId,
+            @RequestParam(value = "chosenEventId", required = false) Integer chosenEventId,
+            Model model) {
+
+        Event event = null;
+        if (chosenEventId != null) {
+            event = talesService.getEventById(chosenEventId);
+        } else {
+            // Apply Destiny Die logic: -1, Blank (0), +1
+            int modifier = ThreadLocalRandom.current().nextInt(3) - 1;
+            int newId = baseEventId + modifier;
+            event = talesService.getEventById(newId);
+            if (event == null) {
+                event = talesService.getEventById(baseEventId);
             }
         }
 

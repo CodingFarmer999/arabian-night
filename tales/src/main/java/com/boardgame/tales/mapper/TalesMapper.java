@@ -40,7 +40,24 @@ public interface TalesMapper {
   @Select("SELECT * FROM events WHERE id = #{eventId}")
   Event findEventById(@Param("eventId") int eventId);
 
-  @Select("SELECT * FROM story_outcomes WHERE event_id = #{eventId} ORDER BY id")
+  @Select("""
+          SELECT so.id, so.event_id, so.parent_id, so.outcome_text, so.reward_str,
+            COALESCE(
+              (
+                SELECT GROUP_CONCAT(
+                  a.name || CASE WHEN oc.is_mandatory = 1 THEN '(強制)' ELSE '' END,
+                  '、'
+                )
+                FROM outcome_conditions oc
+                JOIN attributes a ON a.id = oc.attribute_id
+                WHERE oc.id = so.condition_param
+              ),
+              so.condition_param
+            ) AS condition_param
+          FROM story_outcomes so
+          WHERE so.event_id = #{eventId}
+          ORDER BY so.id
+      """)
   List<StoryOutcome> findOutcomesByEventId(@Param("eventId") int eventId);
 
   @Select("SELECT * FROM encounter_cards WHERE type = 'SPECIAL' ORDER BY adj_id")

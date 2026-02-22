@@ -1,8 +1,11 @@
-package com.boardgame.tales;
+package com.boardgame.tales.controller;
 
 import com.boardgame.tales.model.EncounterResponse;
 import com.boardgame.tales.model.Event;
 import com.boardgame.tales.service.TalesService;
+
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,6 +64,21 @@ public class TalesController {
             @RequestParam("actionId") int actionId,
             Model model) {
         Event event = talesService.getEvent(matrixLetter, adjId, actionId);
+
+        if (event != null) {
+            // Apply Destiny Die logic: -1, Blank (0), +1
+            // Randomly choose a modifier from {-1, 0, 1}
+            int modifier = ThreadLocalRandom.current().nextInt(3) - 1;
+
+            if (modifier != 0) {
+                int newId = event.getId() + modifier;
+                Event modifiedEvent = talesService.getEventById(newId);
+                if (modifiedEvent != null) {
+                    event = modifiedEvent;
+                }
+            }
+        }
+
         model.addAttribute("event", event);
         return "index :: story-display";
     }

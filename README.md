@@ -1,4 +1,4 @@
-# arabian-night (一千零一夜桌遊輔助工具)
+# arabian-night (一千零一夜桌遊輔助工具) - Vibe Coding
 
 這是一個為桌遊**《一千零一夜 (Tales of the Arabian Nights)》**所開發的專屬輔助系統。旨在幫助玩家在遊玩過程中，更方便地處理繁雜的劇本查閱、狀態紀錄與事件結算等機制，大幅提升整體的遊戲體驗。
 
